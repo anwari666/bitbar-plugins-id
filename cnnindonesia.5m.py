@@ -52,35 +52,38 @@ def main() :
 
   print('CNN ID')
   print('---')
+  response_body = None
 
   # Try to open the URL
   try:
-    # req = request.urlopen(url='https://www.cnnindonesia.com/')
-    # response_body = req.read() # the response's body
+    req = request.urlopen(url='https://www.cnnindonesia.com/')
+    response_body = req.read() # the response's body
     
-    response_body = open('./cnnindonesia_201222_0624.html', 'r').read()
+    # response_body = open('./cnnindonesia_201222_0624.html', 'r').read()
 
   except:
     print('Tydack bisa konek :(')
 
-  soup = BeautifulSoup(response_body, 'html.parser')
+  if (response_body is not None) :
 
-  # === Berita Utama
-  utama_soup = soup.find(id='slide_bu')
-  print_section('UTAMA', utama_soup)
+    soup = BeautifulSoup(response_body, 'html.parser')
 
-
-  # === TERPOPULER
-  popular_soup = soup.find(class_='r_content').find(class_="box mb20")
-  print_section('TERPOPULER', popular_soup)
-
-  # === Headlines (id=headline is instance)
-  headline_soup = soup.find(id='headline')
-  print_section('HEADLINES', headline_soup)
+    # === Berita Utama
+    utama_soup = soup.find(id='slide_bu')
+    print_section('UTAMA', utama_soup)
 
 
-  # === TERBARU
-  latest_soup = soup.find(class_='berita_terbaru_lst')
-  print_section('TERBARU', latest_soup)
+    # === TERPOPULER
+    popular_soup = soup.find(class_='r_content').find(class_="box mb20")
+    print_section('TERPOPULER', popular_soup)
+
+    # === Headlines (id=headline is instance)
+    headline_soup = soup.find(id='headline')
+    print_section('HEADLINES', headline_soup)
+
+
+    # === TERBARU
+    latest_soup = soup.find(class_='berita_terbaru_lst')
+    print_section('TERBARU', latest_soup)
 
 main()
