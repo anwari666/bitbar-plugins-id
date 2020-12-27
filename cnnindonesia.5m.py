@@ -35,7 +35,7 @@ def print_articles( articles_soup ) :
       url = url['href'].strip()
 
       # pretty print in terminal
-      print( format_title(title), ' | href=', url )
+      print( format_title(title), ' | href='+url )
 
 
 def print_section(title, section_soup, level=0, limit=10) :
