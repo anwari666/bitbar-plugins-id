@@ -16,9 +16,10 @@ def format_title( title, maxlen=60 ):
   else :
     return title.ljust(maxlen)
 
+
 def print_articles( articles_soup ) :
   """ 
-  input   : articles in bs4 soup
+  input   : articles in bs4 soup - only requires the title and url
   output  : printed string
   """ 
 
@@ -34,6 +35,7 @@ def print_articles( articles_soup ) :
 
       # pretty print in terminal
       print( format_title(title), '| href='+url )
+
 
 def print_articles_newsfeed(articles_soup) :
   """
@@ -69,7 +71,7 @@ def print_section(title, section_soup, level=0, limit=10) :
 
 
 
-# ==== main thingy ===
+# ==== main function to call ===
 def main() :
 
   print('dtk')
@@ -81,10 +83,11 @@ def main() :
     req = request.urlopen(url='https://www.detik.com/')
     response_body = req.read() # the response's body
     
+    # alternatively, read from saved file
     # response_body = open('./detikcom_201227.html', 'r').read()
 
   except:
-    print('Tydack bisa konek :(')
+    print('Cannot connect :(')
 
   if (response_body is not None) :
 
@@ -100,4 +103,6 @@ def main() :
     print('### News Feed ###')
     print_articles_newsfeed(feed_articles)
 
+
+# call the main program here
 main()
