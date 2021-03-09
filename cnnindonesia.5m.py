@@ -40,7 +40,7 @@ def print_articles( articles_soup ) :
 
 def print_section(title, section_soup, level=0, limit=10) :
   """
-  A method to print a whole section of articles, along with its title
+  A general method to print a whole section of articles, along with its title
   """
   articles = section_soup.find_all('article')
   print('### ', title, ' ###')
@@ -49,6 +49,9 @@ def print_section(title, section_soup, level=0, limit=10) :
 
 # ==== main thingy ===
 def main() :
+  """
+  Main function to be called
+  """
 
   print('CNN ID')
   print('---')
@@ -86,4 +89,6 @@ def main() :
     latest_soup = soup.find(class_='berita_terbaru_lst')
     print_section('TERBARU', latest_soup)
 
+
+# Call the main function
 main()
