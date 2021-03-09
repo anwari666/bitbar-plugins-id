@@ -7,6 +7,7 @@
 import urllib.request
 import json
 
+# key availble from the old version of Transferwise's website
 TRANSFERWISE_KEY = "dad99d7d8e52c2c8aaf9fda788d8acdc"
 
 # Replace with desired currencies
@@ -18,12 +19,16 @@ url = "https://transferwise.com/api/v1/payment/calculate?amount=1" \
       "&isGuaranteedFixedTarget=false" \
       "&sourceCurrency={}&targetCurrency={}".format(currency_from, currency_to)
 
-tw_req = urllib.request.Request(url, headers={'X-Authorization-key': TRANSFERWISE_KEY})
+req = urllib.request.Request(url, headers={'X-Authorization-key': TRANSFERWISE_KEY})
+
+# for BitBar
+print("💰")
+print("---")
 
 resp = None
 
 try: 
-  resp = urllib.request.urlopen( tw_req )
+  resp = urllib.request.urlopen( req )
 
 except:
   "tyda bisa konek :("
@@ -34,9 +39,7 @@ if resp is not None:
   printout = f"{currency_from}/{currency_to} {result:,}"
   printout = printout.replace(',','#').replace('.',',').replace('#','.')
   
-  print("💰")
-  print("---")
   print( printout )
 
 else:
-  print( "gagal request ke transferwise" )
+  print( "Cannot connect to TransferWise" )
