@@ -1,4 +1,4 @@
-#!/usr/bin/env PYTHONIOENCODING=UTF-8 /usr/local/bin/python3
+#!/usr/bin/env PYTHONIOENCODING=UTF-8 /usr/bin/python3
 
 import urllib.request as request
 from bs4 import BeautifulSoup

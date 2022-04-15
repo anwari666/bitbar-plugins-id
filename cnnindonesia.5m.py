@@ -1,4 +1,6 @@
-#!/usr/bin/env PYTHONIOENCODING=UTF-8 /usr/local/bin/python3
+#!/usr/bin/env PYTHONIOENCODING=UTF-8 /usr/bin/python3
+# THIS MODULE IS DEPRECATED SINCE CNN INDONESIA DOES NOT PROVIDE 
+# CONTENT DIRECTLY IN THE HTML
 
 import urllib.request as request
 from bs4 import BeautifulSoup

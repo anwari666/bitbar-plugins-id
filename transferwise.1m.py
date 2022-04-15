@@ -1,4 +1,4 @@
-#!/usr/bin/env PYTHONIOENCODING=UTF-8 /usr/local/bin/python3
+#!/usr/bin/env PYTHONIOENCODING=UTF-8 /usr/bin/python3
 # -*- coding: utf-8 -*-
 # taken from Andrew Keating's transferwise module
 # modified using python 3
