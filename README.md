@@ -1,6 +1,7 @@
 This repo contains my menubar utilities, aimed at Indonesian-related utils. At the moment it contains:
 
-- CNN Indonesia's news updater (cnnindonesia.5m.py). This requires `beautifulsoup`. Install using `pip` or your OS's package manager.
+## What's inside
+- Deprecated: ~~CNN Indonesia's news updater (cnnindonesia.5m.py). This requires `beautifulsoup`. Install using `pip` or your OS's package manager~~. 
 - Detik.com news updater (detikcom.5m.py). Same requirements as CNN Indonesia above
 - Transferwise rate updater (transferwise.1m.py)
 
