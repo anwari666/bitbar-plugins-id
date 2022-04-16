@@ -66,7 +66,8 @@ def print_section(title, section_soup, level=0, limit=10) :
   A method to print a whole section of articles, along with its title
   """
   articles = section_soup.find_all('article')
-  print('### ', title, ' ###')
+  print(title)
+  print('---')
   print_articles( articles[0:limit] )
 
 
@@ -95,12 +96,14 @@ def main() :
 
     # === Berita Populer
     popular_soup = soup.find(class_="box cb-mostpop")
-    print_section('Berita Populer', popular_soup)
+    print_section('Berita Populer|href=#', popular_soup)
 
 
     # === News Feed
     feed_articles = soup.find_all('article', class_='ph_newsfeed_d')
-    print('### News Feed ###')
+    print('---')
+    print('News Feed|href=#')
+    print('---')
     print_articles_newsfeed(feed_articles)
 
 
