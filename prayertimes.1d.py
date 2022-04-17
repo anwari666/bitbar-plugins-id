@@ -22,7 +22,7 @@ method    = 12 # 12 is from Sistem Informasi Hisab Rukyat Indonesia.
 
 
 def format_line(str):
-  return str + "| trim=false href=#"
+  return str + "| trim=false | color=#FFFFFE"
 
 
 def format_monospace(str):
