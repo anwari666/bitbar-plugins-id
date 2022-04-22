@@ -9,7 +9,7 @@ import urllib.request
 import json
 import datetime
 
-# ------ SETTINGS -------
+# ====== SETTINGS ======
 # Grab your latitude and longitude from Google Map
 # by pinpointing any location, and you'll find those
 # in the url with this format `@latitude,longitude` e.g @12.345,67.123
@@ -18,7 +18,7 @@ latitude  = 41.176181
 longitude = -8.584248
 timezone  = "Europe/Lisbon"
 method    = 3 # 12 is from Sistem Informasi Hisab Rukyat Indonesia. 
-# ------ END SETTINGS -------
+# ====== END SETTINGS ======
 
 PRAYER_TRANSLATION = {
   "Fajr"    : "Shubuh",
@@ -28,13 +28,24 @@ PRAYER_TRANSLATION = {
   "Isha"    : "Isya"
 }
 
-def format_line(str):
-  return str + "| trim=false | color=#dddddd"
+class TextFormatter:
+  __text = ''
 
+  def __init__(self, txt):
+    self.__text = txt
 
-def format_monospace(str):
-  font="Monaco"
-  return str + f" font={font}"
+  def highlight(self):
+    self.__text += "| href=# "
+    return self
+
+  def monospace(self):
+    font="Monaco"
+    self.__text += f"| font={font} "
+    return self
+
+  def get(self):
+    return self.__text
+
 
 def by_value(item):
   return item[1]
@@ -43,15 +54,24 @@ def by_value(item):
 def now():
   return datetime.datetime.now()
 
-def isya():
-  return datetime.datetime(2022, 4, 17, 19, 0, 0)
-
-def next_prayer_time():
+def next_prayer_time(prayers):
   # get current time
+  found_next = False
+  
   # iterate over (sorted) result
+  for prayer_name, prayer_time in sorted(prayers.items(), key=by_value):
+    
   # while current time is smaller, continue until it's bigger.
-  # you found it. Return that shit
-  noop()
+    if prayer_name in PRAYER_TRANSLATION.keys():
+
+      prayer_datetime = convert_24h_to_datetime(prayer_time)
+      
+      # you found it. Return that.
+      if ((prayer_datetime > now()) and not found_next ) :
+        return prayer_name
+
+  return "past isya"
+
 
 def convert_24h_to_datetime(str):
   [hour, minute] = str.split(':')
@@ -83,7 +103,27 @@ def remaining_time(later, now):
 def format_time(num, hand):
   return f"{num} {hand} "  if num != 0 else ""
 
-def main():
+def print_info(prayers):
+  
+  print( TextFormatter(f"Jadwal solat hari ini coy").highlight().get() )
+
+  next_prayer = next_prayer_time(prayers)
+  next_time = convert_24h_to_datetime(prayers[next_prayer])
+  
+  print( TextFormatter(":soon: " + PRAYER_TRANSLATION[next_prayer] + " dalam " + remaining_time(next_time, now()) + " | emojize=true ").highlight().get() )
+  print("---")
+
+def print_tables(prayers):
+  for prayer_name, prayer_time in sorted(prayers.items(), key=by_value):
+    if prayer_name in PRAYER_TRANSLATION.keys():
+      print( TextFormatter(f"{ PRAYER_TRANSLATION[prayer_name]:18} {prayer_time}" ).monospace().highlight().get() )
+
+def print_prayers(prayers):
+  print_info(prayers)
+  print_tables(prayers)
+
+
+def fetch_prayers():
   url = "http://salahhour.com/index.php/api/prayer_times?latitude={}&longitude={}" \
         "&timezone={}&time_format=0&method={}" \
         "&maghrib_rule=1&maghrib_value=4" \
@@ -91,47 +131,34 @@ def main():
 
   req = urllib.request.Request(url)
 
-  resp = None
+  response = None
 
   try: 
-    resp = urllib.request.urlopen( req )
+    response = urllib.request.urlopen( req )
 
   except:
     "tyda bisa konek :("
 
-  if resp is not None:
-    
-    print( format_line(f"Jadwal solat hari ini"))
-    print("---")
+  return response
 
-    prayers = json.loads(resp.read())['results']
 
-    found_next = ''
-    # now = now()
-    
-    for prayer_name, prayer_time in sorted(prayers.items(), key=by_value):
-      
-      if prayer_name in PRAYER_TRANSLATION.keys():
+def main():
+  response = fetch_prayers()
 
-        prayer_datetime = convert_24h_to_datetime(prayer_time)
-        
-        if ((prayer_datetime > now()) and (found_next == '')) :
-          found_next = prayer_name
-          print( format_line(PRAYER_TRANSLATION[prayer_name] + " dalam " + remaining_time(prayer_datetime, now())))
-          
-    print("---")
-
-    for prayer_name, prayer_time in sorted(prayers.items(), key=by_value):
-      if prayer_name in PRAYER_TRANSLATION.keys():
-        print( format_monospace(format_line(f"{ PRAYER_TRANSLATION[prayer_name]:16} {prayer_time}" )))
-
+  if response is not None:
+    prayers = json.loads(response.read())['results']
+    print_prayers(prayers)
 
   else:
-    print( "Cannot connect to SalahHour API" )
+    print( "Tidak dapat terhubung dengan internet" )
 
+  return False
+
+
+
+# Start from here
 print("🙏")
 print("---")
-#print( f"Isya dalam { remaining_time() }" )
 
 # Actually run the app
 main()
