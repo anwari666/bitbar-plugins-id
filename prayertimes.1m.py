@@ -50,35 +50,53 @@ class TextFormatter:
 
 
 
+class TimeService:
 
-class PrayerTimeService:
-  """Class to deal with prayer timings"""
-
-  def __init__(self, prayers):
+  def __init__(self):
     
-    self.__prayers = prayers
-    self.__next_prayer = None
-    self.__now = None
-    self.__next_prayer_time = None
-    
-    self.now()
-    self.next_prayer_time()
-    self.calc_next_prayer_time()
+    self.now = datetime.datetime.now()
 
+  
+  def total_hours(self, seconds ):
+    return int(seconds // 3600)
 
+  def total_minutes(self, seconds ):
+    return int(( seconds % 3600 ) // 60)
 
-  # get current time
-  def now(self):
-    self.__now = datetime.datetime.now()
+  def difference_in_seconds(self, later, newer): 
+    return ( later - newer ).total_seconds()
 
+  def remaining_hour(self, later, newer):
+    return self.total_hours( self.difference_in_seconds( later, newer ) )
+
+  def remaining_minutes(self, later, newer):
+    return self.total_minutes( self.difference_in_seconds( later, newer ) )
+
+  def format_time(self, num, hand):
+    return f"{num} {hand} "  if num != 0 else ""
 
   def by_value(self, item):
     return item[1]
 
 
-  def next_prayer_time(self):
-    # get current time
-    found_next = False
+
+class PrayerTimeService(TimeService):
+  """Class to deal with prayer timings"""
+
+  def __init__(self, prayers):
+    
+    super().__init__()
+
+    self.__prayers = prayers
+    
+    self.__next_prayer = None
+    self.calc_next_prayer()
+    
+    self.__next_prayer_time = None
+    self.calc_next_prayer_time()
+
+
+  def calc_next_prayer(self):
     
     # iterate over (sorted) result
     for prayer_name, prayer_time in sorted(self.__prayers.items(), key=self.by_value):
@@ -88,11 +106,14 @@ class PrayerTimeService:
 
         prayer_datetime = self.convert_24h_to_datetime(prayer_time)
         
-        # you found it. Return that.
-        if ((prayer_datetime > self.__now) and not found_next ) :
+        # Found the next one.
+        if (prayer_datetime > self.now) :
           self.__next_prayer = prayer_name
+          return
 
+    # if not found, set default to past isya.
     self.__next_prayer = PAST_ISYA # "Isha"
+
 
   def get_next_prayer(self):
     return self.__next_prayer
@@ -109,33 +130,17 @@ class PrayerTimeService:
 
   def convert_24h_to_datetime(self, str):
     [hour, minute] = str.split(':')
-    return datetime.datetime( int(self.__now.year), 
-                              int(self.__now.month), 
-                              int(self.__now.day),
+    return datetime.datetime( int(self.now.year), 
+                              int(self.now.month), 
+                              int(self.now.day),
                               int(hour),
                               int(minute), 
                               0)
 
-  def total_hours(self, seconds ):
-    return int(seconds // 3600)
-
-  def total_minutes(self, seconds ):
-    return int(( seconds % 3600 ) // 60)
-
-  def difference_in_seconds(self, later, newer): 
-    return ( later - newer ).total_seconds()
-
-  def remaining_hour(self, later, newer):
-    return self.total_hours( self.difference_in_seconds( later, newer ) )
-
-  def remaining_minutes(self, later, newer):
-    return self.total_minutes( self.difference_in_seconds( later, newer ) )
 
   def time_to_next_prayer(self):
-    return self.format_time( self.remaining_hour( self.__next_prayer_time, self.__now ), 'jam') + self.format_time(self.remaining_minutes(  self.__next_prayer_time, self.__now  ), 'menit')
+    return self.format_time( self.remaining_hour( self.__next_prayer_time, self.now ), 'jam') + self.format_time(self.remaining_minutes(  self.__next_prayer_time, self.now  ), 'menit')
 
-  def format_time(self, num, hand):
-    return f"{num} {hand} "  if num != 0 else ""
 
 
 class PrintService:
@@ -145,22 +150,22 @@ class PrintService:
 
   def print_info(self, prayers):
     
-    print( TextFormatter(f"Jadwal solat hari ini coy").highlight().get() )
+    print( TextFormatter(f"Jadwal solat hari ini").highlight().get() )
 
     prayer_times = PrayerTimeService(prayers)
     next_prayer = prayer_times.get_next_prayer()
 
+
     if (next_prayer != PAST_ISYA):
       next_time = prayer_times.get_next_prayer_time()
-      # print(next_prayer, next_time)
-      info_text = TextFormatter(":soon: " + PRAYER_TRANSLATION[next_prayer] + " dalam " + prayer_times.time_to_next_prayer() + " | emojize=true ")
+      info_text = TextFormatter(":arrow_right: " + PRAYER_TRANSLATION[next_prayer] + " dalam " + prayer_times.time_to_next_prayer() + " | emojize=true ")
       print( info_text.highlight().get() )
     
     print("---")
 
 
   def print_tables(self, prayers):
-    for prayer_name, prayer_time in sorted(prayers.items(), key=PrayerTimeService(prayers).by_value):
+    for prayer_name, prayer_time in sorted(prayers.items(), key=TimeService().by_value):
       if prayer_name in PRAYER_TRANSLATION.keys():
         prayer_row_text = TextFormatter(f"{ PRAYER_TRANSLATION[prayer_name]:18} {prayer_time}" )
         print( prayer_row_text.monospace().highlight().get() )
@@ -173,12 +178,15 @@ class PrintService:
 
 
 class PrayerService:
-  """Class to fetch prayers data. Later will probably utilise sqlite to not overload the server."""
+  """
+  Class to fetch prayers data. 
+  Later will probably utilise sqlite to not always fetching the API every minute."""
 
   def __init__(self):
       return None
 
   def fetch(self):
+    """Fetch method will change based on whether there is cached data"""
     url = "http://salahhour.com/index.php/api/prayer_times?latitude={}&longitude={}" \
           "&timezone={}&time_format=0&method={}" \
           "&maghrib_rule=1&maghrib_value=4" \
@@ -200,8 +208,11 @@ class PrayerService:
     return None
 
 
-
 def main():
+  """Main function to invoke"""
+  print("🙏")
+  print("---")
+
   prayers = PrayerService().fetch()
 
   if prayers is not None:
@@ -213,10 +224,5 @@ def main():
   return False
 
 
-
-# Start from here
-print("🙏")
-print("---")
-
-# Actually run the app
+# Run the main function
 main()
