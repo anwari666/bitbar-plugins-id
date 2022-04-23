@@ -14,10 +14,10 @@ import datetime
 # by pinpointing any location, and you'll find those
 # in the url with this format `@latitude,longitude` e.g @12.345,67.123
 
-latitude  = -6.9034443
-longitude = 107.5731168
-timezone  = "Asia/Jakarta"
-method    = 12 # 12 is from Sistem Informasi Hisab Rukyat Indonesia. 
+latitude  = 41.176181
+longitude = -8.584248
+timezone  = "Europe/Lisbon"
+method    = 3 # 12 is from Sistem Informasi Hisab Rukyat Indonesia. 
 
 # ====== END SETTINGS ======
 
