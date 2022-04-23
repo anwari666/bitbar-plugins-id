@@ -96,13 +96,13 @@ def main() :
 
     # === Berita Populer
     popular_soup = soup.find(class_="box cb-mostpop")
-    print_section('Berita Populer|href=#', popular_soup)
+    print_section('📌 Berita Populer', popular_soup)
 
 
     # === News Feed
     feed_articles = soup.find_all('article', class_='ph_newsfeed_d')
     print('---')
-    print('News Feed|href=#')
+    print('📌 News Feed')
     print('---')
     print_articles_newsfeed(feed_articles)
 
