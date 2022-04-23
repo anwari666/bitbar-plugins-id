@@ -14,10 +14,11 @@ import datetime
 # by pinpointing any location, and you'll find those
 # in the url with this format `@latitude,longitude` e.g @12.345,67.123
 
-latitude  = 41.176181
-longitude = -8.584248
-timezone  = "Europe/Lisbon"
-method    = 3 # 12 is from Sistem Informasi Hisab Rukyat Indonesia. 
+latitude  = -6.9034443
+longitude = 107.5731168
+timezone  = "Asia/Jakarta"
+method    = 12 # 12 is from Sistem Informasi Hisab Rukyat Indonesia. 
+
 # ====== END SETTINGS ======
 
 PRAYER_TRANSLATION = {
@@ -32,19 +33,22 @@ PAST_ISYA = "PAST_ISYA"
 
 class TextFormatter:
   """Class to format the text's output"""
-
+  
   def __init__(self, txt):
     self.__text = txt
 
+  
   def highlight(self):
     self.__text += "| href=# "
     return self
 
+  
   def monospace(self):
     font="Monaco"
     self.__text += f"| font={font} "
     return self
 
+  
   def get(self):
     return self.__text
 
@@ -53,28 +57,33 @@ class TextFormatter:
 class TimeService:
 
   def __init__(self):
-    
     self.now = datetime.datetime.now()
-
+  
   
   def total_hours(self, seconds ):
     return int(seconds // 3600)
 
+  
   def total_minutes(self, seconds ):
     return int(( seconds % 3600 ) // 60)
 
+  
   def difference_in_seconds(self, later, newer): 
     return ( later - newer ).total_seconds()
 
+  
   def remaining_hour(self, later, newer):
     return self.total_hours( self.difference_in_seconds( later, newer ) )
 
+  
   def remaining_minutes(self, later, newer):
     return self.total_minutes( self.difference_in_seconds( later, newer ) )
 
+  
   def format_time(self, num, hand):
     return f"{num} {hand} "  if num != 0 else ""
 
+  
   def by_value(self, item):
     return item[1]
 
@@ -84,7 +93,6 @@ class PrayerTimeService(TimeService):
   """Class to deal with prayer timings"""
 
   def __init__(self, prayers):
-    
     super().__init__()
 
     self.__prayers = prayers
@@ -121,7 +129,7 @@ class PrayerTimeService(TimeService):
 
   def get_next_prayer_time(self):
     return self.__next_prayer_time
-    
+
 
   def calc_next_prayer_time(self):
     if ( self.__next_prayer != PAST_ISYA ):
@@ -144,9 +152,6 @@ class PrayerTimeService(TimeService):
 
 
 class PrintService:
-  
-  def __init__(self):
-    return None
 
   def print_info(self, prayers):
     
@@ -182,9 +187,6 @@ class PrayerService:
   Class to fetch prayers data. 
   Later will probably utilise sqlite to not always fetching the API every minute."""
 
-  def __init__(self):
-      return None
-
   def fetch(self):
     """Fetch method will change based on whether there is cached data"""
     url = "http://salahhour.com/index.php/api/prayer_times?latitude={}&longitude={}" \
@@ -208,21 +210,24 @@ class PrayerService:
     return None
 
 
-def main():
-  """Main function to invoke"""
-  print("🙏")
-  print("---")
 
-  prayers = PrayerService().fetch()
+class App:
+  """The actual app to invoke"""
+  def main():
+    
+    print("🙏")
+    print("---")
 
-  if prayers is not None:
-    PrintService().print(prayers)
+    prayers = PrayerService().fetch()
 
-  else:
-    print( "Tidak dapat terhubung dengan internet" )
+    if prayers is not None:
+      PrintService().print(prayers)
 
-  return False
+    else:
+      print( "Tidak dapat terhubung dengan internet" )
+
+    return False
 
 
 # Run the main function
-main()
+App.main()
