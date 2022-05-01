@@ -132,7 +132,7 @@ class PrayerTimeService(TimeService):
 
   def calc_next_prayer_time(self):
     if (self.__next_prayer != PAST_ISYA):
-      next_prayer_hour = self.__prayers[self.__next_prayer]
+      next_prayer_hour        = self.__prayers[self.__next_prayer]
       self.__next_prayer_time = self.convert_24h_to_datetime(next_prayer_hour)
 
   def time_to_next_prayer(self):
@@ -229,5 +229,6 @@ class App:
     return False
 
 
-# Run the main function
-App.main()
+if (__name__ == "__main__"):
+  # Run the main function
+  App.main()
