@@ -43,6 +43,11 @@ class TextFormatter:
     return self
 
   
+  def small(self):
+    self.__text += "| size=12 "
+    return self
+
+  
   def monospace(self):
     font="Monaco"
     self.__text += f"| font={font} "
@@ -82,6 +87,16 @@ class TimeService:
   
   def format_time(self, num, hand):
     return f"{num} {hand} "  if num != 0 else ""
+
+
+  def convert_24h_to_datetime(self, str):
+    [hour, minute] = str.split(':')
+    return datetime.datetime( int(self.now.year), 
+                              int(self.now.month), 
+                              int(self.now.day),
+                              int(hour),
+                              int(minute), 
+                              0)
 
   
   def by_value(self, item):
@@ -133,39 +148,36 @@ class PrayerTimeService(TimeService):
 
   def calc_next_prayer_time(self):
     if ( self.__next_prayer != PAST_ISYA ):
-      self.__next_prayer_time = self.convert_24h_to_datetime(self.__prayers[self.__next_prayer])
-
-
-  def convert_24h_to_datetime(self, str):
-    [hour, minute] = str.split(':')
-    return datetime.datetime( int(self.now.year), 
-                              int(self.now.month), 
-                              int(self.now.day),
-                              int(hour),
-                              int(minute), 
-                              0)
+      next_prayer_hour = self.__prayers[self.__next_prayer]
+      self.__next_prayer_time = self.convert_24h_to_datetime(next_prayer_hour)
 
 
   def time_to_next_prayer(self):
-    return self.format_time( self.remaining_hour( self.__next_prayer_time, self.now ), 'jam') + self.format_time(self.remaining_minutes(  self.__next_prayer_time, self.now  ), 'menit')
+    remaining_hour    = self.remaining_hour( self.__next_prayer_time, self.now )
+    remaining_minutes = self.remaining_minutes(  self.__next_prayer_time, self.now  )
+    return self.format_time( remaining_hour, 'jam') + self.format_time( remaining_minutes, 'menit')
 
 
 
 class PrintService:
 
   def print_info(self, prayers):
-    
-    print( TextFormatter(f"Jadwal solat hari ini").highlight().get() )
 
+    header_text = TextFormatter(f"Jadwal solat hari ini")
+    
     prayer_times = PrayerTimeService(prayers)
     next_prayer = prayer_times.get_next_prayer()
 
-
     if (next_prayer != PAST_ISYA):
+      print( header_text.small().get() )
+
       next_time = prayer_times.get_next_prayer_time()
       info_text = TextFormatter(":arrow_right: " + PRAYER_TRANSLATION[next_prayer] + " dalam " + prayer_times.time_to_next_prayer() + " | emojize=true ")
       print( info_text.highlight().get() )
     
+    else:
+      print( header_text.get() )
+
     print("---")
 
 
