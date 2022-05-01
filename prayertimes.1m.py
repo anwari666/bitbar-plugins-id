@@ -44,7 +44,7 @@ class TextFormatter:
 
   
   def small(self):
-    self.__text += "| size=10 "
+    self.__text += "| size=12 "
     return self
 
   
@@ -87,6 +87,16 @@ class TimeService:
   
   def format_time(self, num, hand):
     return f"{num} {hand} "  if num != 0 else ""
+
+
+  def convert_24h_to_datetime(self, str):
+    [hour, minute] = str.split(':')
+    return datetime.datetime( int(self.now.year), 
+                              int(self.now.month), 
+                              int(self.now.day),
+                              int(hour),
+                              int(minute), 
+                              0)
 
   
   def by_value(self, item):
@@ -138,17 +148,8 @@ class PrayerTimeService(TimeService):
 
   def calc_next_prayer_time(self):
     if ( self.__next_prayer != PAST_ISYA ):
-      self.__next_prayer_time = self.convert_24h_to_datetime(self.__prayers[self.__next_prayer])
-
-
-  def convert_24h_to_datetime(self, str):
-    [hour, minute] = str.split(':')
-    return datetime.datetime( int(self.now.year), 
-                              int(self.now.month), 
-                              int(self.now.day),
-                              int(hour),
-                              int(minute), 
-                              0)
+      next_prayer_hour = self.__prayers[self.__next_prayer]
+      self.__next_prayer_time = self.convert_24h_to_datetime(next_prayer_hour)
 
 
   def time_to_next_prayer(self):
