@@ -11,40 +11,57 @@ sys.modules["prayertimes"] = module
 spec.loader.exec_module(module)
 
 # now we can load the module called prayertimes
-from prayertimes import TextFormatter
+from prayertimes import TextFormatter, TimeService
 
 
 class TextFormatterTest(unittest.TestCase):
 
   def setUp(self):
-    self.sampleText = "sample"
-    self.textFormatter = TextFormatter(self.sampleText)
+    self.sample_text = "sample"
+    self.formatted_text = TextFormatter(self.sample_text)
 
   def test_instance(self):
-    self.assertIsInstance(self.textFormatter, TextFormatter)
+    self.assertIsInstance(self.formatted_text, TextFormatter)
 
   def test_get(self):
-    self.assertTrue(hasattr(self.textFormatter, 'get'))
-    self.assertEqual(self.textFormatter.get(), self.sampleText)
+    self.assertTrue(hasattr(self.formatted_text, 'get'))
+    self.assertEqual(self.formatted_text.get(), self.sample_text)
 
   def test_highlight(self):
-    self.assertTrue(hasattr(self.textFormatter, 'highlight'))
-    highlighted_text = self.textFormatter.highlight().get()
+    self.assertTrue(hasattr(self.formatted_text, 'highlight'))
+    highlighted_text = self.formatted_text.highlight().get()
     self.assertIn('href=#', highlighted_text)
 
   def test_small(self):
-    self.assertTrue(hasattr(self.textFormatter, 'small'))
-    small_text = self.textFormatter.small().get()
+    self.assertTrue(hasattr(self.formatted_text, 'small'))
+    small_text = self.formatted_text.small().get()
     self.assertIn('size=12', small_text)
 
   def test_monospace(self):
-    self.assertTrue(hasattr(self.textFormatter, 'monospace'))
-    monospace_text = self.textFormatter.monospace().get()
+    self.assertTrue(hasattr(self.formatted_text, 'monospace'))
+    monospace_text = self.formatted_text.monospace().get()
     self.assertIn('font=Monaco', monospace_text)
 
   def test_combo(self):
-    combo_text = self.textFormatter.highlight().small().monospace().get()
+    combo_text = self.formatted_text.highlight().small().monospace().get()
     self.assertIn('font=Monaco', combo_text)
     self.assertIn('size=12', combo_text)
     self.assertIn('href=#', combo_text)
     self.assertNotEqual('sample', combo_text)
+
+
+class TimeServiceTest(unittest.TestCase):
+
+  def setUp(self):
+    self.timing = TimeService()
+    
+  def test_total_hours(self):
+    self.assertRaises(TypeError, TimeService.total_hours, 'a' )
+    self.assertRaises( ValueError, TimeService.total_hours, -1 )
+    
+    self.assertEqual( 0, TimeService.total_hours(seconds=0) )
+    self.assertEqual( 0, TimeService.total_hours(seconds=1) )
+    self.assertEqual( 0, TimeService.total_hours(seconds=3599) )
+    self.assertEqual( 1, TimeService.total_hours(seconds=3600) )
+    self.assertEqual( 1, TimeService.total_hours(seconds=3601) )
+    self.assertEqual( 2, TimeService.total_hours(seconds=7200) )

@@ -33,7 +33,8 @@ PAST_ISYA = "PAST_ISYA"
 
 
 class TextFormatter:
-  """Class to format the text's output"""
+  """Class to format the text's output
+  based on xbar's formatting with pipes """
 
   def __init__(self, txt):
     self.__text = txt
@@ -57,33 +58,40 @@ class TextFormatter:
 
 class TimeService:
 
-  def __init__(self):
-    self.now = datetime.datetime.now()
+  @staticmethod
+  def now():
+    return datetime.datetime.now()
 
   @staticmethod
   def total_hours(seconds):
-    return int(seconds // 3600)
+    if (seconds >= 0):
+      return int(seconds // 3600)
+    raise ValueError('Parameter must be greater than 0 seconds')
 
-  def total_minutes(self, seconds):
+  @staticmethod
+  def total_minutes(seconds):
     return int((seconds % 3600) // 60)
 
-  def difference_in_seconds(self, later, newer):
+  @staticmethod
+  def difference_in_seconds(later, newer):
     return (later - newer).total_seconds()
 
-  def remaining_hour(self, later, newer):
-    return self.total_hours(self.difference_in_seconds(later, newer))
-
-  def remaining_minutes(self, later, newer):
-    return self.total_minutes(self.difference_in_seconds(later, newer))
-
-  def format_time(self, num, hand):
+  @staticmethod
+  def format_time(num, hand):
     return f"{num} {hand} " if num != 0 else ""
 
+  def remaining_hour(self, seconds):
+    return self.total_hours(seconds)
+
+  def remaining_minutes(self, seconds):
+    return self.total_minutes(seconds) + 1
+  
   def convert_24h_to_datetime(self, str):
     [hour, minute] = str.split(':')
-    return datetime.datetime( int(self.now.year), 
-                              int(self.now.month),
-                              int(self.now.day),
+    now = self.now()
+    return datetime.datetime( int(now.year), 
+                              int(now.month),
+                              int(now.day),
                               int(hour),
                               int(minute),
                               0)
@@ -117,7 +125,7 @@ class PrayerTimeService(TimeService):
         prayer_datetime = self.convert_24h_to_datetime(prayer_time)
 
         # Found the next one.
-        if (prayer_datetime > self.now):
+        if (prayer_datetime > self.now()):
           self.__next_prayer = prayer_name
           return
 
@@ -136,8 +144,10 @@ class PrayerTimeService(TimeService):
       self.__next_prayer_time = self.convert_24h_to_datetime(next_prayer_hour)
 
   def time_to_next_prayer(self):
-    remaining_hour    = self.remaining_hour(self.__next_prayer_time, self.now)
-    remaining_minutes = self.remaining_minutes(self.__next_prayer_time, self.now)
+    now               = self.now()
+    seconds_diff      = self.difference_in_seconds(self.__next_prayer_time, now)
+    remaining_hour    = self.remaining_hour(seconds_diff)
+    remaining_minutes = self.remaining_minutes(seconds_diff)
     return self.format_time(remaining_hour, 'jam') + self.format_time(remaining_minutes, 'menit')
 
 
@@ -147,9 +157,7 @@ class PrintService:
     self.__prayers = prayers
 
   def print_info(self):
-
     header_text   = TextFormatter(f"Jadwal solat hari ini")
-
     prayer_times  = PrayerTimeService(self.__prayers)
     next_prayer   = prayer_times.get_next_prayer()
 
@@ -214,7 +222,6 @@ class App:
 
   @classmethod
   def main(cls):
-
     print("🙏")
     print("---")
 
