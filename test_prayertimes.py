@@ -65,3 +65,10 @@ class TimeServiceTest(unittest.TestCase):
     self.assertEqual( 1, TimeService.total_hours(seconds=3600) )
     self.assertEqual( 1, TimeService.total_hours(seconds=3601) )
     self.assertEqual( 2, TimeService.total_hours(seconds=7200) )
+
+  def test_total_minutes(self):
+    self.assertEqual( 0, TimeService.total_minutes(seconds=0) )
+    self.assertEqual( 0, TimeService.total_minutes(seconds=59) )
+    self.assertEqual( 1, TimeService.total_minutes(seconds=60) )
+    self.assertEqual( 2, TimeService.total_minutes(seconds=120) )
+    self.assertEqual( 0, TimeService.total_minutes(seconds=3600) )
